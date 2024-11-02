@@ -3,16 +3,16 @@ FROM python:3.11
 # Set the working directory
 WORKDIR /usr/src/mergebot
 
-# Copy all project files
+# Create a non-root user with UID and GID in the required range
+RUN addgroup --gid 10001 mergebotgroup && \
+    adduser --disabled-password --gecos "" --uid 10001 --gid 10006 mergebotuser
+
+# Copy all project files (done after user creation)
 COPY . /usr/src/mergebot
 
 # Set permissions for the project directory
-RUN chown -R root:root /usr/src/mergebot && \
+RUN chown -R mergebotuser:mergebotgroup /usr/src/mergebot && \
     chmod -R 775 /usr/src/mergebot
-
-# Create a non-root user with a UID in the required range
-RUN addgroup --gid 10001 mergebotgroup && \
-    adduser --disabled-password --gecos "" --uid 10001 --gid 10001 mergebotuser
 
 # Update pip, setuptools, and wheel
 RUN pip install --upgrade pip setuptools wheel
