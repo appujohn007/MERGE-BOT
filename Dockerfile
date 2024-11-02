@@ -6,6 +6,14 @@ WORKDIR /usr/src/mergebot
 # Copy all project files
 COPY . /usr/src/mergebot
 
+# Set permissions for the project directory
+RUN chown -R mergebotuser:mergebotgroup /usr/src/mergebot && \
+    chmod -R 775 /usr/src/mergebot
+
+# Create an empty, writable log file
+RUN touch /usr/src/mergebot/mergebotlog.txt && \
+    chmod 666 /usr/src/mergebot/mergebotlog.txt
+
 # Update pip, setuptools, and wheel
 RUN pip install --upgrade pip setuptools wheel
 
@@ -31,8 +39,11 @@ RUN chmod +x start.sh
 RUN addgroup --gid 10001 mergebotgroup && \
     adduser --disabled-password --gecos "" --uid 10001 --gid 10001 mergebotuser
 
+# Change ownership of mergebotlog.txt to the non-root user
+RUN chown mergebotuser:mergebotgroup /usr/src/mergebot/mergebotlog.txt
+
 # Switch to the non-root user
-USER 10001
+USER mergebotuser
 
 # Expose the port
 EXPOSE 8080
