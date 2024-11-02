@@ -7,24 +7,23 @@ WORKDIR /usr/src/mergebot
 COPY . /usr/src/mergebot
 
 # Set permissions for the project directory
-RUN chown -R mergebotuser:mergebotgroup /usr/src/mergebot && \
+RUN chown -R root:root /usr/src/mergebot && \
     chmod -R 775 /usr/src/mergebot
 
-# Create an empty, writable log file
-RUN touch /usr/src/mergebot/mergebotlog.txt && \
-    chmod 666 /usr/src/mergebot/mergebotlog.txt
+# Create a non-root user with a UID in the required range
+RUN addgroup --gid 10001 mergebotgroup && \
+    adduser --disabled-password --gecos "" --uid 10001 --gid 10001 mergebotuser
 
 # Update pip, setuptools, and wheel
 RUN pip install --upgrade pip setuptools wheel
 
-RUN pip install -r needs.txt 
+# Create an empty, writable log file
+RUN touch /usr/src/mergebot/mergebotlog.txt && \
+    chown mergebotuser:mergebotgroup /usr/src/mergebot/mergebotlog.txt && \
+    chmod 666 /usr/src/mergebot/mergebotlog.txt
 
-RUN pip install python-dotenv 
-
-# Create and activate the virtual environment, and install dependencies
-RUN python -m venv venv && \
-    . venv/bin/activate && \
-    pip install --no-cache-dir -r needs.txt
+# Switch to the non-root user
+USER mergebotuser
 
 # Install necessary system packages
 RUN apt-get -y update && \
@@ -32,18 +31,13 @@ RUN apt-get -y update && \
     apt-get install -y git wget curl pv jq ffmpeg neofetch mediainfo && \
     apt-get clean
 
-# Make start.sh executable before switching users
+# Create and activate the virtual environment, and install dependencies
+RUN python -m venv venv && \
+    . venv/bin/activate && \
+    pip install --no-cache-dir -r needs.txt
+
+# Make start.sh executable
 RUN chmod +x start.sh
-
-# Create a non-root user with UID and GID within the required range
-RUN addgroup --gid 10001 mergebotgroup && \
-    adduser --disabled-password --gecos "" --uid 10001 --gid 10001 mergebotuser
-
-# Change ownership of mergebotlog.txt to the non-root user
-RUN chown mergebotuser:mergebotgroup /usr/src/mergebot/mergebotlog.txt
-
-# Switch to the non-root user
-USER mergebotuser
 
 # Expose the port
 EXPOSE 8080
