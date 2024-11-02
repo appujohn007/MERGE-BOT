@@ -27,4 +27,4 @@ EXPOSE 8080
 RUN chmod +x start.sh
 
 # Start the application
-CMD ["bash", "start.sh"]
+CMD ["python", "bot.py"] 
