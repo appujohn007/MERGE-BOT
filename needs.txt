@@ -9,4 +9,5 @@ pyromod
 python-dotenv
 requests
 TgCrypto
+Flask
 dotenv
