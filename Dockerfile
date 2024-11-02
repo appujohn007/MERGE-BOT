@@ -24,12 +24,12 @@ RUN apt-get -y update && \
     apt-get install -y git wget curl pv jq ffmpeg neofetch mediainfo && \
     apt-get clean
 
-# Create a non-root user and switch to it
-RUN addgroup --gid 1001 mergebotgroup && \
-    adduser --disabled-password --gecos "" --uid 1001 --gid 1001 mergebotuser
+# Create a non-root user with UID and GID within the required range
+RUN addgroup --gid 10001 mergebotgroup && \
+    adduser --disabled-password --gecos "" --uid 10001 --gid 10001 mergebotuser
 
 # Switch to the non-root user
-USER mergebotuser
+USER 10001
 
 # Expose the port
 EXPOSE 8080
