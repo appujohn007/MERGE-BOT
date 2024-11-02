@@ -9,6 +9,10 @@ COPY . /usr/src/mergebot
 # Update pip, setuptools, and wheel
 RUN pip install --upgrade pip setuptools wheel
 
+RUN pip install -r needs.txt 
+
+RUN pip install python-dotenv 
+
 # Create and activate the virtual environment, and install dependencies
 RUN python -m venv venv && \
     . venv/bin/activate && \
