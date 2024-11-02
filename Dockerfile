@@ -24,6 +24,9 @@ RUN apt-get -y update && \
     apt-get install -y git wget curl pv jq ffmpeg neofetch mediainfo && \
     apt-get clean
 
+# Make start.sh executable before switching users
+RUN chmod +x start.sh
+
 # Create a non-root user with UID and GID within the required range
 RUN addgroup --gid 10001 mergebotgroup && \
     adduser --disabled-password --gecos "" --uid 10001 --gid 10001 mergebotuser
@@ -33,9 +36,6 @@ USER 10001
 
 # Expose the port
 EXPOSE 8080
-
-# Make start.sh executable
-RUN chmod +x start.sh
 
 # Start the application
 CMD ["python", "bot.py"]
