@@ -31,6 +31,10 @@ RUN chmod +x start.sh
 RUN addgroup --gid 10001 mergebotgroup && \
     adduser --disabled-password --gecos "" --uid 10001 --gid 10001 mergebotuser
 
+# Grant read and write permissions to the working directory for the non-root user
+RUN chown -R mergebotuser:mergebotgroup /usr/src/mergebot && \
+    chmod -R 755 /usr/src/mergebot
+
 # Switch to the non-root user
 USER 10001
 
