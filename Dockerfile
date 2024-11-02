@@ -24,6 +24,13 @@ RUN apt-get -y update && \
     apt-get install -y git wget curl pv jq ffmpeg neofetch mediainfo && \
     apt-get clean
 
+# Create a non-root user and switch to it
+RUN addgroup --gid 1001 mergebotgroup && \
+    adduser --disabled-password --gecos "" --uid 1001 --gid 1001 mergebotuser
+
+# Switch to the non-root user
+USER mergebotuser
+
 # Expose the port
 EXPOSE 8080
 
@@ -31,4 +38,4 @@ EXPOSE 8080
 RUN chmod +x start.sh
 
 # Start the application
-CMD ["python", "bot.py"] 
+CMD ["python", "bot.py"]
