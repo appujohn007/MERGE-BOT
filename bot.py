@@ -8,6 +8,8 @@ import asyncio
 import os
 import shutil
 import time
+from flask import Flask
+import threading
 
 import psutil
 import pyromod
@@ -52,6 +54,18 @@ pyrogram.utils.MIN_CHANNEL_ID = -1009999999999
 botStartTime = time.time()
 parent_id = Config.GDRIVE_FOLDER_ID
 
+
+# Initialize Flask app
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return "Hello, World!"
+
+# Run the Flask app in a separate thread
+def run_flask():
+    app.run(host='0.0.0.0', port=8080)
+    
 
 class MergeBot(Client):
     def start(self):
@@ -714,4 +728,6 @@ if __name__ == "__main__":
         Config.IS_PREMIUM = False
         pass
 
+    flask_thread = threading.Thread(target=run_flask)
+    flask_thread.start()
     mergeApp.run()
